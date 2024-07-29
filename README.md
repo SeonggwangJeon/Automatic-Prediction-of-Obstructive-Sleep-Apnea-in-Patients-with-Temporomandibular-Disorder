@@ -41,4 +41,4 @@ This repository contains the code for the paper "Automatic Prediction of Obstruc
   - Seonggwang Jeon: qq22512@hanyang.ac.kr
   
 ## Acknowledgments
-  - This work was supported by the Department of Orofacial Pain and Oral Medicine, Kyung Hee University Dental Hospital, and the Department
+  - This work was supported by the Department of Orofacial Pain and Oral Medicine, Kyung Hee University Dental Hospital, and the Department of Computer Science, Hanyang University.
