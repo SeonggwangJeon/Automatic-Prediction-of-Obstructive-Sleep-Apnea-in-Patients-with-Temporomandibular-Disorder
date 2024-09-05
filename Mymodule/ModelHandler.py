@@ -11,18 +11,23 @@ def get_model(model_name, device, pretrained=False, freeze = False):
     if model_name.startswith('vgg11'):
         model = VGG11(pretrained)
     
-    if model_name.startswith('inception'):
-        model = Inception(pretrained)
-    
     if model_name.startswith('resnet18'):
         model = ResNet18(pretrained)
     
     if model_name.startswith('vgg16'):
         model = VGG16(pretrained, freeze)
+        
+    if model_name.startswith('vgg19'):
+        model = VGG19(pretrained, freeze)
+        
     elif model_name.startswith('resnet50'):
         model = ResNet50(pretrained)
+        
     elif model_name.startswith('resnet152'):
         model = ResNet152(pretrained)
+        
+    elif model_name.startswith('inception'):
+        model = Inception(pretrained)
     
     elif model_name.startswith('shallow_three_layer'):
         model = nn.Sequential(nn.Linear(8, 4), nn.Sigmoid(), nn.Linear(4, 2), nn.Sigmoid(), nn.Linear(2, 1)) 
@@ -46,10 +51,10 @@ def get_last_conv_channel(model):
 
 
 class Inception(nn.Module):
-    def __init__(self, pretrained):
+    def __init__(self, pretrained, freeze):
         super(Inception, self).__init__()
-        self.temp = models.inception_v3(pretrained=pretrained, aux_logits=False)
-        self.temp.fc = nn.Linear(in_features=2048, out_features=1, bias=True)
+        self.temp = models.inception_v3(pretrained=pretrained, aux_logits=True)
+        self.temp.fc = nn.Linear(in_features=2048, out_features=1, bias=True).requires_grad_(not freeze)
     
     def forward(self, x):
         x = self.temp(x)
@@ -71,12 +76,12 @@ class ResNet18(nn.Module):
 
 
 class ResNet50(nn.Module):
-    def __init__(self, pretrained):
+    def __init__(self, pretrained, freeze):
         super(ResNet50, self).__init__()
         temp = models.resnet50(pretrained=pretrained)
         temp.fc = nn.Identity()        
         self.base = temp
-        self.classifier = nn.Linear(in_features=get_last_conv_channel(self), out_features=1)
+        self.classifier = nn.Linear(in_features=get_last_conv_channel(self), out_features=1).requires_grad_(not freeze)
         
     def forward(self, x):
         x = self.base(x)
@@ -95,6 +100,18 @@ class ResNet152(nn.Module):
         return x
 
     
+    
+class VGG11(nn.Module):
+    def __init__(self, pretrained):
+        super(VGG11, self).__init__()
+        self.base = models.vgg11_bn(pretrained=pretrained)
+        self.base.avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
+        self.base.classifier = nn.Linear(in_features=512, out_features=1, bias=True)
+
+    def forward(self, x):
+        x = self.base(x)
+        return x      
+    
 class VGG16(nn.Module):
     def __init__(self, pretrained, freeze):
         super(VGG16, self).__init__()
@@ -105,19 +122,17 @@ class VGG16(nn.Module):
     def forward(self, x):
         x = self.base(x)
         return x
-    
-    
-
-class VGG11(nn.Module):
-    def __init__(self, pretrained):
-        super(VGG11, self).__init__()
-        self.base = models.vgg11_bn(pretrained=pretrained)
+        
+class VGG19(nn.Module):
+    def __init__(self, pretrained, freeze):
+        super(VGG19, self).__init__()
+        self.base = models.vgg19_bn(pretrained=pretrained)
         self.base.avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
-        self.base.classifier = nn.Linear(in_features=512, out_features=1, bias=True)
-
+        self.base.classifier = nn.Linear(in_features=512, out_features=1, bias=True).requires_grad_(not freeze)
+        
     def forward(self, x):
         x = self.base(x)
-        return x  
+        return x    
     
 class Shallow_three_layer(nn.Module):
     def __init__(self):
