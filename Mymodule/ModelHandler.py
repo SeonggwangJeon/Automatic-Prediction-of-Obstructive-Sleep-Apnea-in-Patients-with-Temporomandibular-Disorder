@@ -8,11 +8,11 @@ import numpy as np
 
 
 def get_model(model_name, device, pretrained=False, freeze = False):
-    if model_name.startswith('vgg11'):
-        model = VGG11(pretrained)
+    #if model_name.startswith('vgg11'):
+    #    model = VGG11(pretrained)
     
-    if model_name.startswith('resnet18'):
-        model = ResNet18(pretrained)
+    #if model_name.startswith('resnet18'):
+        #model = ResNet18(pretrained)
     
     if model_name.startswith('vgg16'):
         model = VGG16(pretrained, freeze)
@@ -21,13 +21,13 @@ def get_model(model_name, device, pretrained=False, freeze = False):
         model = VGG19(pretrained, freeze)
         
     elif model_name.startswith('resnet50'):
-        model = ResNet50(pretrained)
+        model = ResNet50(pretrained, freeze)
         
     elif model_name.startswith('resnet152'):
-        model = ResNet152(pretrained)
+        model = ResNet152(pretrained, freeze)
         
     elif model_name.startswith('inception'):
-        model = Inception(pretrained)
+        model = Inception(pretrained, freeze)
     
     elif model_name.startswith('shallow_three_layer'):
         model = nn.Sequential(nn.Linear(8, 4), nn.Sigmoid(), nn.Linear(4, 2), nn.Sigmoid(), nn.Linear(2, 1)) 
